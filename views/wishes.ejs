@@ -1,0 +1,77 @@
+<!doctype html>
+<html ng-app="wish">
+<head>
+	<meta charset="UTF-8">
+	<!-- Optimize mobile viewport -->
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Wish</title>
+ 
+	<link rel="stylesheet" href="/stylesheets/bootstrap/bootstrap.css"><!-- load bootstrap -->
+ 
+	<script type="text/javascript" src="/javascripts/jquery/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript" src="/javascripts/bootstrap/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/javascripts/angular/angular.min.js"></script>
+	<script type="text/javascript" src="/javascripts/moments/moment-with-langs.min.js"></script>
+	<script type="text/javascript" src="/javascripts/core.js"></script>
+</head>
+<body ng-controller="mainController" ng-init="initialize()">
+	<% include navbar/navbar %>
+	<div class="container">
+		<div class="jumbotron text-center">
+			<h1>Things I wish for: <span class="label label-warning">{{ wishes.length }}</span></h1>
+		</div>
+ 
+		<!-- WISH LIST -->
+		<div id="wish-list" class="row">
+			<div class="col-sm-4 col-sm-offset-4">
+ 
+				<!-- LOOP OVER WISHES IN $scope.wishes -->
+				<div ng-repeat="wish in wishes">
+					<label>
+						<span class="btn btn-danger" ng-click="deleteWish(wish._id)">Delete</span>
+						{{ wish.date | timeago }}
+						<span class="btn btn-success" ng-click="createHave(wish.text)">{{wish.text}}</span>
+					</label>
+				</div>
+ 
+			</div>
+		</div>
+ 
+		<!-- FORM TO CREATE WISHES -->
+		<div id="wish-form" class="row">
+			<div class="col-sm-8 col-sm-offset-2 text-center">
+				<form>
+					<div class="form-group">
+ 
+						<!-- BIND THIS VALUE TO formData.text IN ANGULAR -->
+						<input type="text" class="form-control input-lg text-center" placeholder="I want world peace...or a PS4..." ng-model="formData.text">
+					</div>
+ 
+					<!-- createWish() WILL CREATE NEW WISHES -->
+					<button type="submit" class="btn btn-success btn-lg" ng-click="createWish()">Add</button>
+				</form>
+			</div>
+		</div>
+ 
+		<div class="jumbotron text-center">
+			<h1>Things I have: <span class="label label-success">{{ haves.length }}</span></h1>
+		</div>
+ 
+		<!-- Have List -->
+		<div id="have-list" class="row">
+			<div class="col-sm-4 col-sm-offset-4">
+ 
+				<!-- LOOP OVER HAVES IN $scope.haves -->
+				<div ng-repeat="have in haves">
+					<label>
+						<span>{{ have.date | timeago }}<span> {{ have.text }}
+					</label>
+				</div>
+ 
+			</div>
+		</div>
+ 
+ 
+	</div>
+</body>
+</html>
