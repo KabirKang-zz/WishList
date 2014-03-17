@@ -1,9 +1,25 @@
 /**
  * Module dependencies.
  */
-
+var http = require('http'),
+    express = require('express'),
+    passport = require('passport'),
+    LocalStrategy = require('passport-local').Strategy,
+    flash = require('connect-flash');
 var express = require('express');
+var app = express();
 
+app.configure(function(){
+    app.use(express.static(__dirname + '/app'));
+    app.use(express.cookieParser('big secret'));
+    app.use(express.bodyParser());
+    app.use(express.methodOverride());
+    app.use(express.cookieSession());
+    app.use(flash());
+    app.use(passport.initialize());
+    app.use(passport.session());
+    app.use(app.router);
+});
 var indexController = require('./routes/IndexController');
 var wishesController = require('./routes/WishesController');
 var registerController = require('./routes/RegisterController');
@@ -16,7 +32,12 @@ var db = require('./config/database');
 
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
-
+passport.use(new LocalStrategy(
+    function(username, password, done) {
+        console.log("LocalStrategy working...");
+        return done(null, { id: 1, username: 'Joe', password: 'schmo'});
+    }
+));
 var security = require('./config/security');
 var User = require('./model/UserModel');
 
@@ -47,9 +68,11 @@ if ('development' == app.get('env')) {
 }
 
 passport.use(new LocalStrategy(User.authenticate()));
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
-
+passport.serializeUser(function(user, done) {
+    done(null, user);
+});passport.deserializeUser(function(obj, done) {
+    done(null, obj);
+});
 
 app.get('/login', function(req, res) {
 	res.render('login', {});
@@ -57,8 +80,18 @@ app.get('/login', function(req, res) {
 
 app.post('/login', passport.authenticate('local', {
 	successRedirect: '/wishes',
-	failureRedirect: '/login'
-}));
+	failureRedirect: '/loginError',
+	failureFlash: true
+}),
+function(req,res){
+	res.redirect('/');
+});
+
+app.get('/loginError', function(req,res) {
+    console.log(req.flash('error'));
+    res.redirect('/login');
+    });
+
 
 app.get('/logout', function(req, res) {
 	req.logout();
